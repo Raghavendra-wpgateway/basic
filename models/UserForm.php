@@ -2,19 +2,34 @@
 
 namespace app\models;
 
-use Yii;
-use yii\base\Model;
-use yii\validators\Validator;
 
-class userForm extends Model
+
+
+
+class userForm extends \yii\db\ActiveRecord
 {
-    private $name;
-    private $email;
+
+    /**
+ * This is the model class for table "tbl_user".
+ * @property string $firstname
+ * @property string $lastname
+ * @property string $email
+ * @property string $password
+ * @property string $contact
+ */
+
    public function rules()
    {
        return [
-           [['name', 'email'], 'required'],
-           ['email', 'email']
+           [['firstname', 'email', 'lastname', 'password', 'contact'], 'required'],
+           ['email', 'email'],
+           [['contact'], 'integer', 'max' => 12],
+           [['firstname', 'lastname'], 'string', 'max' => 50 ]
        ];
+   }
+
+   public static function tableName()
+   {
+       return 'tbl_user';
    }
 }

@@ -9,8 +9,13 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-use app\models\userForm;
+use app\models\UserForm;
+use GuzzleHttp\Psr7\Query;
+use yii\base\ErrorException;
+// use yii\db\Query;
+// use yii\db\ActiveRecord;
 
+// 
 class SiteController extends Controller
 {
     /**
@@ -132,16 +137,47 @@ class SiteController extends Controller
      * creating custom function to show and submit a user form data
      */
 
-     public function userForm()
+     public function actionUserform()
      {
-         $model = new userForm();
+         $model1 = new UserForm();
+         $session = Yii :: $app->session;
 
          if(Yii::$app->request->post())
          {
-              echo "Success";
+              echo "<pre>";
+              $post_Arr = Yii::$app->request->post();
+
+            try{
+               
+               $model = new userForm();
+            
+              $model->firstname = $post_Arr['userForm']['firstname'];
+              $model->lastname = $post_Arr['userForm']['lastname'];
+              $model->email = $post_Arr['userForm']['email'];
+              $model->password = $post_Arr['userForm']['password'];
+              $model->contact = $post_Arr['userForm']['contact'];
+
+              $insert_result = $model->save();
+              
+              if($insert_result)
+              {
+                $session->setFlash('db_success', 'User registered successfully');
+                return $this->goBack(Yii::$app->request->referrer);
+              }
+              else{
+                $session->setFlash('db_error', 'User registration failed');
+                return $this->goBack(Yii::$app->request->referrer);
+
+              }
+            }
+            catch(ErrorException $ex)
+            {
+                echo $ex->getMessage();
+            }
+
          }
          else{
-             return $this->render('user_form', ['model' => $model]);
+             return $this->render('user_form', ['model' => $model1 , 'session' => $session]);
          }
      }
 }
